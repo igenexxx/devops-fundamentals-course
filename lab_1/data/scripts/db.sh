@@ -78,6 +78,18 @@ list() {
 	fi
 }
 
+find_entry() {
+	quetion_username="Please enter username $validator_requirements > "
+
+	read -p "$quetion_username" username
+  until [[ $username =~ ^[a-zA-Z]+$ ]]; do
+		read -p "$quetion_username" username
+  done
+
+	result=$(grep -iw $username <(cat -b $user_db_path | sed 's/\t/. /'))
+	echo $result
+}
+
 backup() {
 	cp $user_db_path $base_dir/$(date +'%Y-%m-%d_%H-%M-%S')-users.db.backup
 
