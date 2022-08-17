@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
 
+user_db_path="$(dirname $0)/../users.db"
 # functions
 check_users_db() {
-	user_db_path="$(dirname $0)/../users.db"
-
 	if [[ ! -e $user_db_path ]]; then
 		confirm "users.db is not exist. Do you want create it?" && touch $user_db_path 
 
@@ -27,11 +26,45 @@ add() {
       read -p "$quetion_role" role
   done
 
-	echo $username, $role
+	echo $username, $role >> $user_db_path
 }
 
-help() {
+help() { 
+    cat << EOF
+Usage:
+    $0 [<command>]
 
+    These are commands available:
+        help
+        add
+        backup
+        find
+        list
+
+    ====================================================
+    $0
+        If not users.db exists, it will be created.
+    add
+        New entity of users.db should be a comma-separated value like: username, role
+        Example:
+            $0 add
+    backup
+        Creates a new file, named %date%-users.db.backup which is a copy of current users.db
+        Example:
+            $0 backup
+    find
+        Prompts the user to type a username, then prints username and role if such exists in users.db.
+        If there is no user with the selected username, the script must print: “User not found”.
+        If there is more than one user with such a username, print all found entries.
+        Example:
+            $0 find
+    list [--inverse]
+        Prints the content of the users.db in the format:
+            N. username, role (N is the number of the user)
+        --inverse
+            Accepts an additional optional parameter --inverse which allows results in the opposite order – from bottom to top. 
+
+EOF
 }
 
 confirm() {
@@ -44,7 +77,7 @@ confirm() {
   done
 }
 
-
+# add, backup, find, list, help
 # commands
 case $1 in
 	"add")
