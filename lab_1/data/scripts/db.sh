@@ -1,49 +1,50 @@
 #!/usr/bin/env bash
 
-base_dir="$(dirname $0)/.."
+base_dir="$(dirname "$0")/.."
 user_db_path="$base_dir/users.db"
+
 # functions
 check_users_db() {
-	if [[ ! -e $user_db_path ]]; then
-		confirm "users.db is not exist. Do you want create it?" && touch $user_db_path 
+    if [[ ! -e $user_db_path ]]; then
+        confirm "users.db is not exist. Do you want create it?" && touch "$user_db_path"
 
-		echo 'users.db was created'
-	fi
+        echo 'users.db was created'
+    fi
 }
 
 add() {
-	check_users_db
-	validator_requirements="[Latin letters only]"
-	quetion_username="Please enter username $validator_requirements > "
-	quetion_role="Please enter role $validator_requirements > "
+    check_users_db
+    validator_requirements="[Latin letters only]"
+    quetion_username="Please enter username $validator_requirements > "
+    quetion_role="Please enter role $validator_requirements > "
 
-	read -p "$quetion_username" username
-  until [[ $username =~ ^[a-zA-Z]+$ ]]; do
-		read -p "$quetion_username" username
-  done
+    read -p "$quetion_username" username
+    until [[ $username =~ ^[a-zA-Z]+$ ]]; do
+        read -p "$quetion_username" username
+    done
 
-	read -p "$quetion_role" role
-  until [[ $role =~ ^[a-zA-Z]+$ ]]; do
-      read -p "$quetion_role" role
-  done
+    read -p "$quetion_role" role
+    until [[ $role =~ ^[a-zA-Z]+$ ]]; do
+        read -p "$quetion_role" role
+    done
 
-	echo $username, $role >> $user_db_path
+    echo "$username", "$role" >>"$user_db_path"
 }
 
-help() { 
-  check_users_db
-  cat << EOF
+help() {
+    check_users_db
+    cat <<EOF
 Usage:
-    $0 [<command>]
+  $0 [<command>]
 
-    These are commands available:
-        help
-        add
-        backup
-        find
-        list
+  These are commands available:
+    help
+    add
+    backup
+    find
+    list
 
-    ====================================================
+  ====================================================
     $0
         If not users.db exists, it will be created.
     add
@@ -62,73 +63,74 @@ Usage:
             $0 find
     list [--inverse]
         Prints the content of the users.db in the format:
-            N. username, role (N is the number of the user)
+        N. username, role (N is the number of the user)
         --inverse
             Accepts an additional optional parameter --inverse which allows results in the opposite order – from bottom to top. 
-
 EOF
 }
 
-
 inverse=$([[ ${2:2} == 'inverse' ]] && echo 0 || echo 1)
 list() {
-	if (( $inverse )); then
-    cat -b $user_db_path | sed 's/\t/. /' 
-	else
-    cat -b $user_db_path | sed 's/\t/. /' | sort -r
-	fi
+    if (($inverse)); then
+        cat -b "$user_db_path" | sed 's/\t/. /'
+    else
+        cat -b "$user_db_path" | sed 's/\t/. /' | sort -r
+    fi
 }
 
 find_entry() {
-	quetion_username="Please enter username $validator_requirements > "
+    quetion_username="Please enter username $validator_requirements > "
 
-	read -p "$quetion_username" username
-  until [[ $username =~ ^[a-zA-Z]+$ ]]; do
-		read -p "$quetion_username" username
-  done
+    read -p "$quetion_username" username
+    until [[ $username =~ ^[a-zA-Z]+$ ]]; do
+        read -p "$quetion_username" username
+    done
 
-	result=$(grep -iw $username <(cat -b $user_db_path | sed 's/\t/. /'))
-	echo $result
+    result=$(grep -iw "$username" <(cat -b "$user_db_path" | sed 's/\t/. /'))
+    echo "$result"
 }
 
 backup() {
-	cp $user_db_path $base_dir/$(date +'%Y-%m-%d_%H-%M-%S')-users.db.backup
-
+    cp "$user_db_path" "$base_dir"/$(date +'%Y-%m-%d_%H-%M-%S')-users.db.backup
 }
 
 restore() {
-  cat "$base_dir/$(ls -1t ../*.backup | cut -c4- | head -1)" > $user_db_path 
+    cat "$base_dir/$(ls -1t ../*.backup | cut -c4- | head -1)" >"$user_db_path"
 }
 
-
-
 confirm() {
-	echo "$1"
-  select yn in "Yes" "No"; do
-      case $yn in
-          Yes ) break;;
-          No ) exit;;
-      esac
-  done
+    echo "$1"
+    select yn in "Yes" "No"; do
+        case $yn in
+        Yes) break ;;
+        No) exit ;;
+        esac
+    done
 }
 
 # add, backup, find, list, help
 # commands
 case $1 in
-	"add")
-		add;;
-	"help")
-		help;;
-	"backup")
-		backup;;
-	"restore")
-		restore;;
-	"find")
-		find_entry;;
-	"list")
-		list;;
-	*)
-		help;;
+"add")
+    add
+    ;;
+"help")
+    help
+    ;;
+"backup")
+    backup
+    ;;
+"restore")
+    restore
+    ;;
+"find")
+    find_entry
+    ;;
+"list")
+    list
+    ;;
+*)
+    help
+    ;;
 esac
-
 
