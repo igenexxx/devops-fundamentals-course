@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-user_db_path="$(dirname $0)/../users.db"
+base_dir="$(dirname $0)/.."
+user_db_path="$base_dir/users.db"
 # functions
 check_users_db() {
 	if [[ ! -e $user_db_path ]]; then
@@ -67,6 +68,25 @@ Usage:
 EOF
 }
 
+
+inverse=$([[ ${2:2} == 'inverse' ]] && echo 0 || echo 1)
+list() {
+	if (( $inverse )); then
+    cat -b $user_db_path | sed 's/\t/. /' 
+	else
+    cat -b $user_db_path | sed 's/\t/. /' | sort -r
+	fi
+}
+
+backup() {
+	cp $user_db_path $base_dir/$(date +'%Y-%m-%d_%H-%M-%S')-users.db.backup
+
+}
+
+restore() {
+  cat "$base_dir/$(ls -1t ../*.backup | cut -c4- | head -1)" > $user_db_path 
+}
+
 confirm() {
 	echo "$1"
   select yn in "Yes" "No"; do
@@ -84,6 +104,16 @@ case $1 in
 		add;;
 	"help")
 		help;;
+	"backup")
+		backup;;
+	"restore")
+		restore;;
+	"find")
+		find_entry;;
+	"list")
+		list;;
+	*)
+		echo "$1 is not a command" && help
 esac
 
 
