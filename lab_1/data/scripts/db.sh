@@ -31,7 +31,8 @@ add() {
 }
 
 help() { 
-    cat << EOF
+  check_users_db
+  cat << EOF
 Usage:
     $0 [<command>]
 
@@ -125,7 +126,7 @@ case $1 in
 	"list")
 		list;;
 	*)
-		echo "$1 is not a command" && help
+		help;;
 esac
 
 
