@@ -41,6 +41,14 @@ if [[ ! -d $compressed_files_path ]]; then
   echo "${compressed_files_path:3} directory created"
 fi
 
+# check if compressed file exist
+
+if [[ -f $compressed_files_path/client-app.zip ]]; then
+  rm $compressed_files_path/client-app.zip
+
+  echo "client-app.zip file removed"
+fi
+
 # Compress with zip
 
 if [[ -d 'dist' ]]; then
