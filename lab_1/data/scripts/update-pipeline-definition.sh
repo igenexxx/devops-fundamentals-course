@@ -11,6 +11,22 @@ fi
 # variables init
 files_path="../content/files"
 pipeline_name=pipeline-$(date +"%d-%m-%Y").json 
+path_to_source_file=${1:-$files_path/pipeline.json}
+
+if [[ -z $1 ]]; then
+  echo "Path to source file is not specified. Using default path: $path_to_source_file"
+
+  select choice in "proceed" "exit"; do
+    case $choice in
+      proceed)
+        break
+        ;;
+      exit)
+        exit 1
+        ;;
+    esac
+  done
+fi
 
 # Get options values
 ARGUMENT_LIST=(
@@ -47,7 +63,7 @@ while [[ $# -gt 0 ]]; do
         shift 2
         ;;
     --poll-for-source-changes)
-        pollForSourceChanges=TRUE
+        pollForSourceChanges=${2:-false}
         shift 2
         ;;
     --configuration)
@@ -78,7 +94,7 @@ update_env_variables() {
 }
 
 # create copy of pipeline.json
-cp $files_path/pipeline.json ./$pipeline_name
+cp $path_to_source_file ./$pipeline_name
 
 # change the pipeline json
 write_to_file <(jq 'del(.metadata)' $pipeline_name)
