@@ -16,6 +16,11 @@ path_to_source_file=${1:-$files_path/pipeline.json}
 if [[ -z $1 ]]; then
   echo "Path to source file is not specified. Using default path: $path_to_source_file"
 
+  if [[ ! -f $path_to_source_file ]]; then
+    echo "Source file not found. Exiting"
+    exit 1
+  fi
+
   select choice in "proceed" "exit"; do
     case $choice in
       proceed)
