@@ -97,7 +97,6 @@ cp $path_to_source_file ./$pipeline_name
 for prop in "${!ARGUMENTS_PROPS_MAP[@]::${#!ARGUMENTS_PROPS_MAP[@]} - 1}"; do
   key=${ARGUMENTS_PROPS_MAP[$prop]}
   param=${key,}
-  echo "dollar key: ${key,}: ${!param}"
 
   if [[ -n ${!param} ]] && ! check_props_exist $key; then
     echo "Property $key not found. Exiting"
